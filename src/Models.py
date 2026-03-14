@@ -55,65 +55,9 @@ class RiceCNN(nn.Module):
         x = self.fc_dropout(F.relu(self.fc1(x)))
         x = self.fc2(x)
         return x
-
-
-class RiceResNet50(nn.Module):
-    """Transfer Learning with ResNet50 - Better for your large dataset"""
-    def __init__(self, num_classes=5, pretrained=True):
-        super(RiceResNet50, self).__init__()
-        self.model = models.resnet50(pretrained=pretrained)
-        
-        # Replace the final layer for 5 classes
-        num_ftrs = self.model.fc.in_features
-        self.model.fc = nn.Linear(num_ftrs, num_classes)
-    
-    def forward(self, x):
-        return self.model(x)
-
-
-class RiceVGG16(nn.Module):
-    """Transfer Learning with VGG16 - Good alternative"""
-    def __init__(self, num_classes=5, pretrained=True):
-        super(RiceVGG16, self).__init__()
-        self.model = models.vgg16(pretrained=pretrained)
-        
-        # Modify classifier
-        num_ftrs = self.model.classifier[6].in_features
-        self.model.classifier[6] = nn.Linear(num_ftrs, num_classes)
-    
-    def forward(self, x):
-        return self.model(x)
-
-
-class RiceMobileNet(nn.Module):
-    """Transfer Learning with MobileNet - Lightweight, faster inference"""
-    def __init__(self, num_classes=5, pretrained=True):
-        super(RiceMobileNet, self).__init__()
-        self.model = models.mobilenet_v2(pretrained=pretrained)
-        
-        # Replace classifier
-        num_ftrs = self.model.classifier[1].in_features
-        self.model.classifier[1] = nn.Linear(num_ftrs, num_classes)
-    
-    def forward(self, x):
-        return self.model(x)
-
     
 if __name__ == "__main__":
-    print("=== Model Architectures ===\n")
-    
-    print("1. Improved Custom CNN:")
+
     model = RiceCNN()
     print(model)
     
-    print("\n2. ResNet50 (Transfer Learning):")
-    model_resnet = RiceResNet50()
-    print(f"ResNet50 loaded. Total parameters: {sum(p.numel() for p in model_resnet.parameters()):,}")
-    
-    print("\n3. VGG16 (Transfer Learning):")
-    model_vgg = RiceVGG16()
-    print(f"VGG16 loaded. Total parameters: {sum(p.numel() for p in model_vgg.parameters()):,}")
-    
-    print("\n4. MobileNet (Transfer Learning - Lightweight):")
-    model_mobile = RiceMobileNet()
-    print(f"MobileNet loaded. Total parameters: {sum(p.numel() for p in model_mobile.parameters()):,}")
