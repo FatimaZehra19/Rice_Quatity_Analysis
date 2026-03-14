@@ -4,6 +4,8 @@ import torch.optim as optim
 from Dataset_loader import train_loader, val_loader
 from Models import RiceCNN
 from tqdm import tqdm
+from pathlib import Path
+from datetime import datetime
 
 # Define the device
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -50,7 +52,11 @@ print("\nEpoch Losses:")
 for i, loss in enumerate(epoch_losses):
     print(f"Epoch {i+1}: {loss:.4f}")
 
-
 # Save the trained model
-torch.save(model.state_dict(), "Experiments/rice_cnn_baseline.pth")
-print("Model saved Successfully.")
+experiments_dir = Path(__file__).parent.parent / "Experiments"
+experiments_dir.mkdir(parents=True, exist_ok=True)
+
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+model_path = experiments_dir / f"rice_cnn_baseline_{timestamp}.pth"
+torch.save(model.state_dict(), model_path)
+print(f"Model saved successfully to: {model_path}")
