@@ -3,7 +3,16 @@ import cv2
 import matplotlib.pyplot as plt
 
 # Path to the dataset
-dataset_path = r"c:\Users\Fatima\Desktop\Rice_thesis_project\Dataset\Rice_Image_Dataset"
+# Get current file directory
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Go to project root
+project_root = os.path.dirname(current_dir)
+
+# Dataset path
+dataset_path = os.path.join(project_root, "Dataset", "Rice_Image_Dataset")
+
+print("Dataset path:", dataset_path)
 
 classes = os.listdir(dataset_path)
 print("Classes in the dataset:", classes)
