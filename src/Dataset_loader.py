@@ -37,17 +37,9 @@ test_size = dataset_size - train_size - val_size  # Remaining 15% for testing
 train_dataset, val_dataset, test_dataset = random_split(datasets, [train_size, val_size, test_size])
 
 # Create DataLoaders for each split
-# num_workers=4: parallel data loading (macOS: use 'fork' to avoid spawn crash)
-# pin_memory=False: MPS does not support pinned memory (only CUDA does)
-train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True,
-                          num_workers=4, pin_memory=False,
-                          persistent_workers=True, multiprocessing_context='fork')
-val_loader   = DataLoader(val_dataset,   batch_size=64, shuffle=False,
-                          num_workers=4, pin_memory=False,
-                          persistent_workers=True, multiprocessing_context='fork')
-test_loader  = DataLoader(test_dataset,  batch_size=64, shuffle=False,
-                          num_workers=4, pin_memory=False,
-                          persistent_workers=True, multiprocessing_context='fork')
+train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
+test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
 
 # Printing Dataset Information
 print("Total number of images in the dataset:", dataset_size)

@@ -7,13 +7,8 @@ from   tqdm import tqdm
 from   pathlib import Path
 from   datetime import datetime
 
-# Define the device — prefer Apple Silicon GPU (MPS) over CPU
-if torch.backends.mps.is_available():
-    device = torch.device("mps")
-elif torch.cuda.is_available():
-    device = torch.device("cuda")
-else:
-    device = torch.device("cpu")
+# Define the device
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
 # Initialize the model
@@ -23,7 +18,6 @@ model = model.to(device)
 # Define the loss function and optimizer
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
-scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.5)
 
 # Training loop
 num_epochs = 30
