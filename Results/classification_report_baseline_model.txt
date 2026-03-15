@@ -1,0 +1,13 @@
+Classification Report - Baseline Model
+============================================================
+              precision    recall  f1-score   support
+
+     Arborio     0.9973    0.9946    0.9960      2227
+     Basmati     0.9987    0.9978    0.9982      2254
+      Ipsala     0.9986    1.0000    0.9993      2200
+     Jasmine     0.9965    0.9947    0.9956      2269
+   Karacadag     0.9957    0.9996    0.9976      2300
+
+    accuracy                         0.9973     11250
+   macro avg     0.9973    0.9973    0.9973     11250
+weighted avg     0.9973    0.9973    0.9973     11250

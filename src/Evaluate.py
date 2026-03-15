@@ -5,7 +5,7 @@ from Dataset_loader import test_loader
 from Models import RiceCNN
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, classification_report
 import seaborn as sns
 
 # Define the device — prefer Apple Silicon GPU (MPS) over CPU
@@ -48,7 +48,7 @@ def plot_confusion_matrix(predictions, labels, model_name):
     
     # Create figure
     plt.figure(figsize=(10, 8))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names, cbar_kws={'label': 'Count'})
+    sns.heatmap(cm, annot=True, fmt='d', cmap=sns.light_palette("steelblue", as_cmap=True), xticklabels=class_names, yticklabels=class_names, cbar_kws={'label': 'Count'})
     plt.title(f'Confusion Matrix - {model_name}')
     plt.ylabel('True Label')
     plt.xlabel('Predicted Label')
@@ -65,6 +65,34 @@ def plot_confusion_matrix(predictions, labels, model_name):
     plt.close()
     
     return output_path
+
+
+def generate_classification_report(predictions, labels, model_name):
+    """Generate and save classification report with precision, recall, and f1-score"""
+    # Get class names
+    class_names = sorted(['Arborio', 'Basmati', 'Ipsala', 'Jasmine', 'Karacadag'])
+    
+    # Generate classification report
+    report = classification_report(labels, predictions, target_names=class_names, digits=4)
+    
+    print(f"\n{'='*60}")
+    print(f"Classification Report - {model_name}")
+    print(f"{'='*60}")
+    print(report)
+    
+    # Save report to file
+    results_dir = Path(__file__).parent.parent / "Results"
+    results_dir.mkdir(exist_ok=True)
+    
+    report_path = results_dir / f"classification_report_{model_name.replace(' ', '_').lower()}.txt"
+    with open(report_path, 'w') as f:
+        f.write(f"Classification Report - {model_name}\n")
+        f.write(f"{'='*60}\n")
+        f.write(report)
+    
+    print(f"✓ Classification report saved to: {report_path}")
+    
+    return report_path
 
 
 def evaluate_model(model_path, model_name):
@@ -122,11 +150,13 @@ if best_model_path.exists():
     best_accuracy, best_predictions, best_labels = evaluate_model(best_model_path, "Best Model")
     if best_predictions is not None:
         plot_confusion_matrix(best_predictions, best_labels, "Best Model")
+        generate_classification_report(best_predictions, best_labels, "Best Model")
 
 # Evaluate baseline model
 if baseline_model_path:
     baseline_accuracy, baseline_predictions, baseline_labels = evaluate_model(baseline_model_path, "Baseline Model")
     if baseline_predictions is not None:
         plot_confusion_matrix(baseline_predictions, baseline_labels, "Baseline Model")
+        generate_classification_report(baseline_predictions, baseline_labels, "Baseline Model")
 
 print("="*60)
