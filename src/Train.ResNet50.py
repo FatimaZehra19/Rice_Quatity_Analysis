@@ -1,11 +1,11 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torchvision import models
-from Dataset_loader import train_loader, val_loader
-from tqdm import tqdm
-from pathlib import Path
-from datetime import datetime
+from   torchvision import models
+from   Dataset_loader import train_loader, val_loader
+from   tqdm import tqdm
+from   pathlib import Path
+from   datetime import datetime
 import json
 import numpy as np
 import random

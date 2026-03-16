@@ -50,10 +50,16 @@ As seen in the training curves, the **Baseline CNN** converged faster due to its
 ### Model Comparison
 - **Accuracy:** Interestingly, the Baseline CNN slightly outperformed ResNet50 on this specific dataset (99.69% vs 99.55%). This suggests that for high-resolution, high-contrast rice grain images, a simpler architecture may be sufficient and less prone to overfitting than a deep 50-layer network.
 - **Robustness:** ResNet50 showed superior performance on the "Ipsala" variety, achieving perfect precision, indicating its strength in identifying distinctive class features.
+- **Micro-Metrics:** As shown in the "Model Performance Comparison" graph, the Baseline CNN maintains a slight edge in Precision, Recall, and F1-score across the entire test set.
+
 
 ### Visualizations
+- **Model Performance Metrics:** The bar chart below compares the overall Precision, Recall, and F1-score for both models, highlighting the high consistency of the Baseline CNN.
 - **Confusion Matrices:** Both models show minimal misclassification, with most errors occurring between "Arborio" and "Jasmine" varieties due to their similar visual textures.
 - **Training Curves:** Validation accuracy for both models plateaued after ~15 epochs, indicating that the learning rate scheduler effectively optimized convergence.
+
+![Model Performance Comparison](../Results/model_performance_comparison.png)
+
 
 ## 4. Conclusion
 Both models are highly suitable for automated rice variety classification. The **Baseline CNN** offers a more efficient (faster inference) solution, while **ResNet50** provides a robust transfer-learning alternative that could potentially generalize better to broader, unseen datasets.

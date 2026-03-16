@@ -1,6 +1,6 @@
 import os 
-from torchvision import datasets, transforms
-from torch.utils.data import DataLoader , random_split
+from   torchvision import datasets, transforms
+from   torch.utils.data import DataLoader , random_split
 
 # Path to the dataset
 # Get current file directory
