@@ -1,0 +1,21 @@
+ResNet50 Transfer Learning - Classification Report
+======================================================================
+
+Test Accuracy: 99.55% (11199/11250)
+Total Test Samples: 11250
+Correct Predictions: 11199
+Incorrect Predictions: 51
+
+DETAILED CLASSIFICATION REPORT:
+======================================================================
+              precision    recall  f1-score   support
+
+     Arborio     0.9935    0.9917    0.9926      2170
+     Basmati     0.9954    0.9963    0.9959      2176
+      Ipsala     1.0000    0.9996    0.9998      2316
+     Jasmine     0.9905    0.9948    0.9926      2304
+   Karacadag     0.9978    0.9947    0.9963      2284
+
+    accuracy                         0.9955     11250
+   macro avg     0.9954    0.9954    0.9954     11250
+weighted avg     0.9955    0.9955    0.9955     11250
