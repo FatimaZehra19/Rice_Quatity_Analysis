@@ -1,0 +1,129 @@
+Dataset path: /Users/azfarabbas/Documents/personal/Rice_Quatity_Analysis/Dataset/Rice_Image_Dataset
+Total number of images in the dataset: 75000
+Number of images in the training set: 52500
+Number of images in the validation set: 11250
+Number of images in the test set: 11250
+======================================================================
+RESNET50 TRANSFER LEARNING - RICE CLASSIFICATION
+======================================================================
+
+📊 HYPERPARAMETERS:
+  • Device: mps
+  • Number of Classes: 5
+  • Number of Epochs: 30
+  • Learning Rate: 0.001
+  • Batch Size: 32
+  • Weight Decay: 0.0001
+  • Dropout Rate: 0.5
+  • Hidden Units: 512
+  • LR Scheduler: StepLR (step=10, gamma=0.5)
+======================================================================
+
+🔄 Loading pretrained ResNet50 (ImageNet weights)...
+✓ Loaded pretrained ResNet50
+  Total parameters: 25,557,032
+  Frozen parameters: 25,557,032
+
+🎯 Replacing final layer with custom classifier for 5 rice classes...
+  Trainable parameters: 1,051,653
+✓ Model ready for training
+
+======================================================================
+🚀 STARTING TRANSFER LEARNING TRAINING
+======================================================================
+
+
+Loss: 0.1968 | Val Acc: 97.02% | LR: 0.001000                                                                                                                     
+  ⭐ New best model saved! Accuracy: 97.02%
+
+Loss: 0.1312 | Val Acc: 98.55% | LR: 0.001000                                                                                                                     
+  ⭐ New best model saved! Accuracy: 98.55%
+
+Loss: 0.1173 | Val Acc: 98.70% | LR: 0.001000                                                                                                                     
+  ⭐ New best model saved! Accuracy: 98.70%
+
+Loss: 0.1170 | Val Acc: 98.48% | LR: 0.001000                                                                                                                     
+
+Loss: 0.1081 | Val Acc: 98.36% | LR: 0.001000                                                                                                                     
+
+Loss: 0.1055 | Val Acc: 98.82% | LR: 0.001000                                                                                                                     
+  ⭐ New best model saved! Accuracy: 98.82%
+
+Loss: 0.1039 | Val Acc: 98.79% | LR: 0.001000                                                                                                                     
+
+Loss: 0.1007 | Val Acc: 98.86% | LR: 0.001000                                                                                                                     
+  ⭐ New best model saved! Accuracy: 98.86%
+
+Loss: 0.0988 | Val Acc: 98.68% | LR: 0.001000                                                                                                                     
+
+Loss: 0.1024 | Val Acc: 98.83% | LR: 0.001000                                                                                                                     
+
+Loss: 0.0738 | Val Acc: 98.91% | LR: 0.000500                                                                                                                     
+  ⭐ New best model saved! Accuracy: 98.91%
+
+Loss: 0.0737 | Val Acc: 99.07% | LR: 0.000500                                                                                                                     
+  ⭐ New best model saved! Accuracy: 99.07%
+
+Loss: 0.0700 | Val Acc: 99.16% | LR: 0.000500                                                                                                                     
+  ⭐ New best model saved! Accuracy: 99.16%
+
+Loss: 0.0701 | Val Acc: 99.22% | LR: 0.000500                                                                                                                     
+  ⭐ New best model saved! Accuracy: 99.22%
+
+Loss: 0.0722 | Val Acc: 99.27% | LR: 0.000500                                                                                                                     
+  ⭐ New best model saved! Accuracy: 99.27%
+
+Loss: 0.0669 | Val Acc: 99.18% | LR: 0.000500                                                                                                                     
+
+Loss: 0.0695 | Val Acc: 99.17% | LR: 0.000500                                                                                                                     
+
+Loss: 0.0724 | Val Acc: 99.18% | LR: 0.000500                                                                                                                     
+
+Loss: 0.0688 | Val Acc: 99.17% | LR: 0.000500                                                                                                                     
+
+Loss: 0.0678 | Val Acc: 98.23% | LR: 0.000500                                                                                                                     
+
+Loss: 0.0582 | Val Acc: 99.24% | LR: 0.000250                                                                                                                     
+
+Loss: 0.0547 | Val Acc: 99.27% | LR: 0.000250                                                                                                                     
+
+Loss: 0.0537 | Val Acc: 99.31% | LR: 0.000250                                                                                                                     
+  ⭐ New best model saved! Accuracy: 99.31%
+
+Loss: 0.0532 | Val Acc: 99.34% | LR: 0.000250                                                                                                                     
+  ⭐ New best model saved! Accuracy: 99.34%
+
+Loss: 0.0529 | Val Acc: 99.40% | LR: 0.000250                                                                                                                     
+  ⭐ New best model saved! Accuracy: 99.40%
+
+Loss: 0.0496 | Val Acc: 99.02% | LR: 0.000250                                                                                                                     
+
+Loss: 0.0508 | Val Acc: 99.24% | LR: 0.000250                                                                                                                     
+
+Loss: 0.0506 | Val Acc: 99.27% | LR: 0.000250                                                                                                                     
+
+Loss: 0.0520 | Val Acc: 99.32% | LR: 0.000250                                                                                                                     
+
+Loss: 0.0522 | Val Acc: 99.43% | LR: 0.000250                                                                                                                     
+  ⭐ New best model saved! Accuracy: 99.43%
+
+✓ Training history saved to: /Users/azfarabbas/Documents/personal/Rice_Quatity_Analysis/Experiments/training_history_resnet50_transfer_20260316_083810.json
+
+======================================================================
+✅ TRAINING COMPLETED!
+======================================================================
+
+📊 RESULTS:
+----------------------------------------------------------------------
+  Best Accuracy: 99.43% (Epoch 30)
+  Final Accuracy: 99.43%
+  Initial Loss: 0.1968
+  Final Loss: 0.0522
+  Loss Reduction: 73.48%
+  Avg Accuracy: 98.95%
+
+💾 SAVED:
+----------------------------------------------------------------------
+  • Model: rice_resnet50_transfer_best.pth
+  • History: training_history_resnet50_transfer_20260316_083810.json
+======================================================================

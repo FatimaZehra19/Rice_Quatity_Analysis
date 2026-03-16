@@ -1,0 +1,25 @@
+{
+    "model": "ResNet50-Transfer-Learning",
+    "timestamp": "20260316_053236",
+    "hyperparameters": {
+        "num_epochs": 1,
+        "learning_rate": 0.001,
+        "batch_size": 32,
+        "num_classes": 5,
+        "hidden_units": 512,
+        "dropout_rate": 0.5,
+        "weight_decay": 0.0001,
+        "lr_scheduler_step": 10,
+        "lr_scheduler_gamma": 0.5
+    },
+    "epoch_losses": [
+        0.19058007154564063
+    ],
+    "val_accuracies": [
+        97.90222222222222
+    ],
+    "best_val_accuracy": 97.90222222222222,
+    "best_epoch": 1,
+    "total_trainable_params": 1051653,
+    "total_params": 25557032
+}
