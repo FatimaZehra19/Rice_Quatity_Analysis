@@ -6,6 +6,17 @@ from   Models import RiceCNN
 from   tqdm import tqdm
 from   pathlib import Path
 from   datetime import datetime
+import random
+import numpy as np
+
+# ========== SEED FOR REPRODUCIBILITY ==========
+SEED = 42
+random.seed(SEED)
+np.random.seed(SEED)
+torch.manual_seed(SEED)
+if torch.cuda.is_available():
+    torch.cuda.manual_seed_all(SEED)
+print(f"Seed set to: {SEED}")
 
 # Define the device
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

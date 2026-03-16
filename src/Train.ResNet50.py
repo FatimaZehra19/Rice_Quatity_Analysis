@@ -8,6 +8,15 @@ from pathlib import Path
 from datetime import datetime
 import json
 import numpy as np
+import random
+
+# ========== SEED FOR REPRODUCIBILITY ==========
+SEED = 42
+random.seed(SEED)
+np.random.seed(SEED)
+torch.manual_seed(SEED)
+if torch.cuda.is_available():
+    torch.cuda.manual_seed_all(SEED)
 
 # ========== HYPERPARAMETERS ==========
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
@@ -26,6 +35,7 @@ print("="*70)
 print("RESNET50 TRANSFER LEARNING - RICE CLASSIFICATION")
 print("="*70)
 print("\n📊 HYPERPARAMETERS:")
+print(f"  • Seed: {SEED}")
 print(f"  • Device: {DEVICE}")
 print(f"  • Number of Classes: {NUM_CLASSES}")
 print(f"  • Number of Epochs: {NUM_EPOCHS}")
@@ -160,6 +170,7 @@ timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 history = {
     "model": "ResNet50-Transfer-Learning",
     "timestamp": timestamp,
+    "seed": SEED,
     "hyperparameters": {
         "num_epochs": NUM_EPOCHS,
         "learning_rate": LEARNING_RATE,
