@@ -45,7 +45,6 @@ Rice_thesis_project
 ## Models Used
 
 - Custom CNN (Baseline)
-- VGG16
 - ResNet50
 - MobileNet
 

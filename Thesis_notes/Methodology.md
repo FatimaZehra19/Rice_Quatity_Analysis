@@ -1,37 +1,59 @@
-## Methodology
+# Methodology
 
-- The Rice Image Dataset containing five rice varieties (Arborio, Basmati, Ipsala, Jasmine, and Karacadag) was used for the classification task.
+The development of the proposed system for rice quality assessment is divided into two primary pipelines: **Rice Variety Classification** using Deep Learning and **Broken Grain Detection** using a Hybrid Computer Vision Approach.
 
-- The dataset was loaded using the PyTorch ImageFolder class, which automatically assigns labels based on the folder structure.
+## 1. Rice Variety Classification Methodology
 
-- All images were resized to 224 × 224 pixels to maintain a consistent input size for the convolutional neural network.
+This section outlines the workflow for developing the automated classification system for different rice varieties.
 
-- Image pixel values were normalized to improve model convergence and training stability.
+### 1.1 Data Acquisition and Preprocessing
+- **Source Material**: The Rice Image Dataset, comprising five distinct varieties—Arborio, Basmati, Ipsala, Jasmine, and Karacadag—was utilized for the classification task.
+- **Data Loading**: The dataset was indexed using the PyTorch `ImageFolder` class, which facilitated automated label mapping based on the hierarchical folder structure.
+- **Normalization and Resizing**: All images underwent standard resizing to **224 × 224 pixels** to ensure a uniform input dimension for the convolutional layers. Pixel intensity values were normalized to accelerate model convergence and maintain training stability.
+- **Dataset Partitioning**: To ensure an unbiased evaluation, the data was stratified into three subsets: **Training (70%)**, **Validation (15%)**, and **Testing (15%)**.
 
-- The dataset was divided into training (70%), validation (15%), and testing (15%) subsets to ensure proper model training and unbiased evaluation.
+### 1.2 Network Architecture and Feature Learning
+- **Baseline Design**: A custom Convolutional Neural Network (CNN) architecture was designed as the project baseline.
+- **Layer Stacking**: The architecture comprises triplets of convolutional layers followed by Max-Pooling operations for effective spatial dimensionality reduction and robust feature extraction.
+- **Non-Linearity**: ReLU (Rectified Linear Unit) activation functions were integrated to model non-linear relationships within the visual data.
+- **Classification Head**: Extracted global features were mapped to a final fully connected layer for probabilistic classification across the five rice categories. 
+- **Learning Objective**: The model was tasked with identifying hierarchical visual features, including grain texture patterns, aspect ratios, and distinctive color distributions unique to each variety.
 
-- A baseline convolutional neural network (CNN) was designed for rice variety classification.
+### 1.3 Model Training Strategy and Optimization
+- **Optimization Algorithm**: The **Adam Optimizer** was employed for parameter updates with a learning rate of **0.001**.
+- **Loss Function**: `CrossEntropyLoss` was used to measure the discrepancy between the predicted and actual variety labels.
+- **Hyperparameter Configuration**: Training was conducted using mini-batch gradient descent with a batch size of **32**.
+- **Model Checkpointing**: The training process monitored validation accuracy across multiple epochs. The state-dictionary of the model achieving the **highest validation accuracy** was persisted as the "best-performing" candidate to prevent overfitting.
 
-- The CNN architecture consists of three convolutional layers followed by max-pooling layers for feature extraction and spatial dimensionality reduction.
+### 1.4 Evaluation Framework
+- **Performance Verification**: Post-training, the optimized weights were evaluated on the independent test subset, ensuring that the accuracy metrics represent the model's ability to generalize to novel images.
+- **Metrics**: Performance was quantified using standard classification metrics including accuracy, precision, and recall.
 
-- ReLU activation functions were applied after convolutional layers to introduce non-linearity.
+## Broken Grain Detection Methodology
 
-- The extracted features were passed through fully connected layers to perform final classification into the five rice varieties.
+A hybrid approach combining computer vision segmentation and geometric feature analysis was used to detect broken rice grains. The methodology is divided into several modular stages for robust and clean image processing:
 
-- The model learns hierarchical visual features such as grain texture, shape, and color patterns from the rice grain images.
+- **Stage 1: Image Preprocessing**:
+    - High-quality grayscale conversion was performed to simplify the image data.
+    - Gaussian blurring was applied to reduce noise and artifacts.
+    - Otsu's thresholding was used for determining optimal thresholds for image segmentation (grains as foreground).
+    - Morphological opening was as a final cleanup step to remove tiny background specks or dust.
 
-- The model was implemented using the PyTorch deep learning framework.
+- **Stage 2: Watershed-Based Segmentation**:
+    - Touching or overlapping grains were separated using the Watershed algorithm. 
+    - This involved calculating a distance transform measuring the distance from each grain pixel to the nearest background pixel.
+    - "Local peaks" were detected within these distance maps using a minimum distance constraint (min_distance=50) to prevent over-segmentation.
+    - These peaks acted as markers for Watershed boundary definition.
 
-- Training was performed using mini-batch gradient descent with a batch size of 32.
+- **Stage 3: Geometric Feature Extraction**:
+    - Extracted properties: **Area**, **Length** (Major Axis), **Width** (Minor Axis), and **Aspect Ratio**.
+    - Centroids were identified for each grain for visual labeling ('F' for Full, 'B' for Broken).
 
-- The Adam optimizer was used to update the model parameters with a learning rate of 0.001.
+- **Stage 4: Relative Classification**:
+    - A dynamic approach was used where grain quality was judged relative to the reference size.
+    - A "Full Grain" reference was established by finding the maximum grain size in the image sample.
+    - Thresholds (75% of max length / 70% of max area) determined if a grain was classified as "Broken."
 
-- CrossEntropyLoss was used as the loss function for the multi-class classification problem.
-
-- The training process was conducted for multiple epochs, during which the training loss and validation accuracy were monitored after each epoch.
-
-- The model achieving the highest validation accuracy during training was saved as the best-performing model.
-
-- After training, the saved model was evaluated on the test dataset, which contains images not seen during the training phase.
-
-- The evaluation process computes classification accuracy on the test set, which represents the final performance of the baseline CNN model.
+- **Stage 5: Batch Reporting and Visualization**:
+    - Results were logged in an audit log across all five varieties.
+    - Visual bar charts were generated to compare broken grain ratios between categories.

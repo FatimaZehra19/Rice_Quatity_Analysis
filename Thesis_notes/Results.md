@@ -42,24 +42,42 @@ We utilized a pretrained **ResNet50** architecture, fine-tuned on the rice datas
 
 ---
 
-## 3. Comparative Analysis
+## 3. MobileNetV2 Transfer Learning Performance
+
+We also evaluated **MobileNetV2**, a lightweight architecture optimized for mobile and embedded vision applications. We used the pretrained weights and fine-tuned the model for the rice classification task.
+
+### Test Evaluation Results (MobileNetV2)
+- **Test Accuracy:** 99.59%
+- **Correct Predictions:** 11,204 / 11,250
+- **Top Performing Class:** Ipsala (1.00 Precision, 1.00 Recall, 1.00 F1-Score)
+
+### Detailed Metrics
+| Class | Precision | Recall | F1-Score |
+|-------|-----------|--------|----------|
+| Arborio | 0.9958 | 0.9879 | 0.9919 |
+| Basmati | 0.9983 | 0.9970 | 0.9976 |
+| Ipsala | 1.0000 | 1.0000 | 1.0000 |
+| Jasmine | 0.9935 | 0.9974 | 0.9954 |
+| Karacadag| 0.9919 | 0.9968 | 0.9944 |
+
+---
+
+## 4. Comparative Analysis
 
 ### Training Dynamics
-As seen in the training curves, the **Baseline CNN** converged faster due to its simpler architecture, while **ResNet50** showed more stable loss reduction over 30 epochs owing to its deep residual connections.
+The **Baseline CNN** and **MobileNetV2** both showed rapid convergence. MobileNetV2, being a depthwise separable convolution-based architecture, achieved high accuracy with significantly fewer parameters than ResNet50. **ResNet50** maintained the most stable but slower convergence path.
 
 ### Model Comparison
-- **Accuracy:** Interestingly, the Baseline CNN slightly outperformed ResNet50 on this specific dataset (99.69% vs 99.55%). This suggests that for high-resolution, high-contrast rice grain images, a simpler architecture may be sufficient and less prone to overfitting than a deep 50-layer network.
-- **Robustness:** ResNet50 showed superior performance on the "Ipsala" variety, achieving perfect precision, indicating its strength in identifying distinctive class features.
-- **Micro-Metrics:** As shown in the "Model Performance Comparison" graph, the Baseline CNN maintains a slight edge in Precision, Recall, and F1-score across the entire test set.
-
+- **Accuracy:** The Baseline CNN achieved the highest accuracy (99.69%), followed by MobileNetV2 (99.59%) and ResNet50 (99.55%).
+- **Robustness:** Both ResNet50 and MobileNetV2 performed exceptionally well on the "Ipsala" variety. MobileNetV2 achieved a **perfect 100% score** (Precision and Recall) for Ipsala, making it the most reliable model for that specific variety.
+- **Resource Efficiency:** MobileNetV2 stands out as the most efficient model, offering high accuracy with a much lower computational footprint, making it ideal for real-time rice quality inspection systems.
 
 ### Visualizations
-- **Model Performance Metrics:** The bar chart below compares the overall Precision, Recall, and F1-score for both models, highlighting the high consistency of the Baseline CNN.
-- **Confusion Matrices:** Both models show minimal misclassification, with most errors occurring between "Arborio" and "Jasmine" varieties due to their similar visual textures.
-- **Training Curves:** Validation accuracy for both models plateaued after ~15 epochs, indicating that the learning rate scheduler effectively optimized convergence.
+- **Model Performance Metrics:** The bar charts in the Results directory compare the overall Precision, Recall, and F1-score for all three models.
+- **Confusion Matrices:** All models show very low misclassification rates. The slight confusion between "Arborio" and "Jasmine" remains the main source of error across all architectures.
+- **Training Curves:** Validation accuracy for all models stabilized after 15-20 epochs.
 
 ![Model Performance Comparison](../Results/model_performance_comparison.png)
 
-
-## 4. Conclusion
-Both models are highly suitable for automated rice variety classification. The **Baseline CNN** offers a more efficient (faster inference) solution, while **ResNet50** provides a robust transfer-learning alternative that could potentially generalize better to broader, unseen datasets.
+## 5. Conclusion
+All three models (Baseline CNN, ResNet50, and MobileNetV2) are highly suitable for automated rice variety classification with over 99.5% accuracy. The **Baseline CNN** is the most accurate for this specific dataset, while **MobileNetV2** provides the best balance of speed and reliability, especially for the Ipsala variety.
