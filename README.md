@@ -35,26 +35,27 @@ Rice_thesis_project
 
 1. Dataset Exploration
 2. Image Preprocessing
-3. Data Augmentation
-4. CNN Model Training
-5. Rice Variety Classification
-6. Broken Grain Detection
-7. Model Evaluation
-8. Explainable AI Analysis
+3. Watershed Segmentation
+4. Deep Learning Model Training (Baseline, MobileNetV2, ResNet50)
+5. Explainable AI Analysis (Grad-CAM, Morphology, Geometric Audits)
+6. Computational Efficiency Benchmarking
+7. Robustness Validation Under Noise/Low-Light
 
-## Models Used
+## Key Results Summary
 
-- Custom CNN (Baseline)
-- ResNet50
-- MobileNet
+| Model | Accuracy | Size (MB) | Inference Speed |
+| :--- | :--- | :--- | :--- |
+| **Baseline CNN** | 99.73% | 8.04 MB | 32.1 ms |
+| **MobileNetV2** | 99.58% | 11.23 MB | 22.5 ms |
+| **ResNet50** | 99.54% | 93.99 MB | 45.8 ms |
 
-## Evaluation Metrics
+*Detailed reports available in `/Results` folder.*
 
-- Accuracy
-- Precision
-- Recall
-- F1 Score
-- Confusion Matrix
+## XAI Techniques Implemented
+
+- **Grad-CAM**: Spatial localization of variety features.
+- **Morphological Profiling**: Quantifying Slenderness and Area metrics.
+- **Decision Auditing**: Explaining human-readable logic for broken grain detection.
 
 ## Tools and Libraries
 

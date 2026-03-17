@@ -1,0 +1,22 @@
+{
+    "Arborio": {
+        "avg_broken": 0.0,
+        "images": 50
+    },
+    "Basmati": {
+        "avg_broken": 2.0,
+        "images": 50
+    },
+    "Ipsala": {
+        "avg_broken": 0.0,
+        "images": 50
+    },
+    "Jasmine": {
+        "avg_broken": 0.0,
+        "images": 50
+    },
+    "Karacadag": {
+        "avg_broken": 0.0,
+        "images": 50
+    }
+}

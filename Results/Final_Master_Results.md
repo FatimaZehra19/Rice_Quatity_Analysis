@@ -1,0 +1,12 @@
+# Final Thesis Results Summary
+
+| Metric               |   Baseline CNN |   MobileNetV2 |   ResNet50 |
+|:---------------------|---------------:|--------------:|-----------:|
+| Accuracy (%)         |        99.73   |       99.58   |    99.54   |
+| Precision            |         0.9973 |        0.9958 |     0.9954 |
+| Recall               |         0.9973 |        0.9958 |     0.9954 |
+| F1-Score             |         0.9973 |        0.9958 |     0.9954 |
+| Model Size (MB)      |         8.04   |       11.23   |    93.99   |
+| Inference Speed (ms) |        32.1    |       22.5    |    45.8    |
+
+*Note: Speed measured on CPU. MobileNetV2 shows the best balance of speed and size.*

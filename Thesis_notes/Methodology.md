@@ -29,7 +29,7 @@ This section outlines the workflow for developing the automated classification s
 - **Performance Verification**: Post-training, the optimized weights were evaluated on the independent test subset, ensuring that the accuracy metrics represent the model's ability to generalize to novel images.
 - **Metrics**: Performance was quantified using standard classification metrics including accuracy, precision, and recall.
 
-## Broken Grain Detection Methodology
+## 2. Broken Grain Detection Methodology
 
 A hybrid approach combining computer vision segmentation and geometric feature analysis was used to detect broken rice grains. The methodology is divided into several modular stages for robust and clean image processing:
 
@@ -56,4 +56,21 @@ A hybrid approach combining computer vision segmentation and geometric feature a
 
 - **Stage 5: Batch Reporting and Visualization**:
     - Results were logged in an audit log across all five varieties.
-    - Visual bar charts were generated to compare broken grain ratios between categories.
+    - Visual bar charts were generated to compare broken grain ratios between categories.
+
+## 3. Explainable AI (XAI) and Interpretability
+
+To ensure the transparency and reliability of the classification models, Explainable AI (XAI) techniques were integrated into the research workflow.
+
+### 3.1 Visual Interpretability with Grad-CAM
+- **Objective**: To identify which spatial regions of a rice image the CNN (MobileNetV2 or ResNet50) prioritizes when predicting a specific variety.
+- **Gradient-weighted Class Activation Mapping (Grad-CAM)**: This technique utilizes the gradients of the target class (e.g., *Basmati*), flowing into the final convolutional layer to produce a localization map.
+- **Target Layers**:
+  - **MobileNetV2**: The final expansion/depthwise-convolutional layer in the feature extractor (`features[18][0]`).
+  - **ResNet50**: The final bottleneck block in the fourth residual layer (`layer4[-1]`).
+- **Heatmap Visualization**: The resulting activation map is superimposed on the original grain image, where warmer colors (red/yellow) indicate higher influence on the model’s classification decision.
+
+### 3.2 Interpretability in Geometric Pipelines
+- **Feature-Space Visualization**: For the broken grain detection pipeline, the decision logic is made "explainable" by visualizing the feature space (Length vs. Area).
+- **Decision Boundary**: Plotting individual grains against the dynamically calculated "Full Grain" reference thresholds allows for a direct audit of the classification logic.
+- **Geometric Annotation**: Automated labeling of each grain with its specific measurements (length/area) provides a clear rationale for every individual "Full" vs. "Broken" classification decision.
