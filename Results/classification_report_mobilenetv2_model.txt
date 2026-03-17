@@ -1,0 +1,21 @@
+MobileNetV2 Transfer Learning - Classification Report
+======================================================================
+
+Test Accuracy: 99.59% (11204/11250)
+Total Test Samples: 11250
+Correct Predictions: 11204
+Incorrect Predictions: 46
+
+DETAILED CLASSIFICATION REPORT:
+======================================================================
+              precision    recall  f1-score   support
+
+     Arborio     0.9958    0.9879    0.9919      2157
+     Basmati     0.9983    0.9970    0.9976      2328
+      Ipsala     1.0000    1.0000    1.0000      2259
+     Jasmine     0.9935    0.9974    0.9954      2293
+   Karacadag     0.9919    0.9968    0.9944      2213
+
+    accuracy                         0.9959     11250
+   macro avg     0.9959    0.9958    0.9959     11250
+weighted avg     0.9959    0.9959    0.9959     11250

@@ -54,36 +54,44 @@ def create_performance_graph():
     
     baseline_report = results_dir / "classification_report_baseline_model.txt"
     resnet_report = results_dir / "classification_report_resnet50_model.txt"
+    mobilenet_report = results_dir / "classification_report_mobilenetv2_model.txt"
     
     # Extract metrics
     baseline_metrics = extract_metrics_from_report(baseline_report)
     resnet_metrics = extract_metrics_from_report(resnet_report)
+    mobilenet_metrics = extract_metrics_from_report(mobilenet_report)
     
-    # Fallback data if parsing fails (based on previous view_file results)
+    # Fallback data if parsing fails
     if not baseline_metrics:
         baseline_metrics = {'precision': 0.9973, 'recall': 0.9973, 'f1-score': 0.9973}
     if not resnet_metrics:
         resnet_metrics = {'precision': 0.9954, 'recall': 0.9954, 'f1-score': 0.9954}
+    if not mobilenet_metrics:
+        mobilenet_metrics = {'precision': 0.9958, 'recall': 0.9958, 'f1-score': 0.9958}
         
     print(f"📊 Metrics for Baseline: {baseline_metrics}")
     print(f"📊 Metrics for ResNet50: {resnet_metrics}")
+    print(f"📊 Metrics for MobileNetV2: {mobilenet_metrics}")
     
     # Data for plotting
     labels = ['Precision', 'Recall', 'F1-Score']
     baseline_vals = [baseline_metrics['precision'], baseline_metrics['recall'], baseline_metrics['f1-score']]
     resnet_vals = [resnet_metrics['precision'], resnet_metrics['recall'], resnet_metrics['f1-score']]
+    mobilenet_vals = [mobilenet_metrics['precision'], mobilenet_metrics['recall'], mobilenet_metrics['f1-score']]
     
     x = np.arange(len(labels))  # label locations
-    width = 0.35  # width of the bars
+    width = 0.25  # width of the bars
     
-    fig, ax = plt.subplots(figsize=(10, 7))
+    fig, ax = plt.subplots(figsize=(12, 8))
     
     # Define colors
     c1 = "#3498db" # Soft blue for Baseline
     c2 = "#2ecc71" # Soft green for ResNet50
+    c3 = "#f39c12" # Soft orange for MobileNetV2
     
-    rects1 = ax.bar(x - width/2, baseline_vals, width, label='Baseline CNN', color=c1, alpha=0.85, edgecolor='black', linewidth=1)
-    rects2 = ax.bar(x + width/2, resnet_vals, width, label='ResNet50 Transfer', color=c2, alpha=0.85, edgecolor='black', linewidth=1)
+    rects1 = ax.bar(x - width, baseline_vals, width, label='Baseline CNN', color=c1, alpha=0.85, edgecolor='black', linewidth=1)
+    rects2 = ax.bar(x, resnet_vals, width, label='ResNet50 Transfer', color=c2, alpha=0.85, edgecolor='black', linewidth=1)
+    rects3 = ax.bar(x + width, mobilenet_vals, width, label='MobileNetV2 Transfer', color=c3, alpha=0.85, edgecolor='black', linewidth=1)
     
     # Add text for labels, title and custom x-axis tick labels, etc.
     ax.set_ylabel('Score (0-1.0)', fontsize=12, fontweight='bold')
@@ -92,9 +100,8 @@ def create_performance_graph():
     ax.set_xticklabels(labels, fontsize=12, fontweight='bold')
     ax.legend(fontsize=11, loc='lower right')
     
-    # Set y-axis limits to highlight differences if they are very close
-    # Since they are around 0.99, let's zoom in a bit or use labels
-    ax.set_ylim(0.98, 1.002) # Focused view
+    # Set y-axis limits to highlight differences
+    ax.set_ylim(0.98, 1.002) 
     
     # Add gridlines
     ax.yaxis.grid(True, linestyle='--', alpha=0.7)
@@ -110,17 +117,18 @@ def create_performance_graph():
                         xytext=(0, 5),  # 3 points vertical offset
                         textcoords="offset points",
                         ha='center', va='bottom',
-                        fontsize=10, fontweight='bold')
+                        fontsize=9, fontweight='bold', rotation=0)
 
     autolabel(rects1)
     autolabel(rects2)
+    autolabel(rects3)
         
-            fig.tight_layout()
+    fig.tight_layout()
                 
-                    # Save the plot
-                        output_path = results_dir / "model_performance_comparison.png"
-                            plt.savefig(output_path, dpi=300, bbox_inches='tight')
-                                print(f"✅ Success! Performance comparison graph saved to: {output_path}")
+    # Save the plot
+    output_path = results_dir / "model_performance_comparison.png"
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    print(f"✅ Success! Performance comparison graph saved to: {output_path}")
     
     plt.show()
 
