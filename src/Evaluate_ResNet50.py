@@ -28,7 +28,6 @@ else:
     device = torch.device("cpu")
 
 print(f"Using device: {device}")
-
 # ========== MODEL CONFIGURATION ==========
 NUM_CLASSES = 5
 HIDDEN_UNITS = 512
@@ -91,7 +90,7 @@ with torch.no_grad():
         
         # Calculate accuracy
         total += labels.size(0)
-        correct += (predicted == labels).sum().item()
+        correct += torch.sum(predicted == labels).item()
         
         # Print progress every 50 batches
         if (batch_idx + 1) % 50 == 0:

@@ -114,13 +114,13 @@ def create_performance_graph():
 
     autolabel(rects1)
     autolabel(rects2)
-    
-    fig.tight_layout()
-    
-    # Save the plot
-    output_path = results_dir / "model_performance_comparison.png"
-    plt.savefig(output_path, dpi=300, bbox_inches='tight')
-    print(f"✅ Success! Performance comparison graph saved to: {output_path}")
+        
+            fig.tight_layout()
+                
+                    # Save the plot
+                        output_path = results_dir / "model_performance_comparison.png"
+                            plt.savefig(output_path, dpi=300, bbox_inches='tight')
+                                print(f"✅ Success! Performance comparison graph saved to: {output_path}")
     
     plt.show()
 
