@@ -6,23 +6,42 @@ from skimage.segmentation import watershed
 
 def segment_grains(binary_image):
     """
-    Applies the Watershed algorithm to segment individual grains.
+    Improved watershed segmentation for overlapping grains
+    (Balanced version – keeps peak detection but fixes merging issue)
     """
-    # 1. Distance transform: find the distance to the nearest background pixel for each foreground pixel
-    distance = ndimage.distance_transform_edt(binary_image)
-    
-    # 2. Local maximums: find the centers of the grains
-    # min_distance determines how close grains can be before being merged
-    local_maxi = peak_local_max(distance, min_distance=50, labels=binary_image)
-    
-    # 3. Create markers for watershed
+
+    # Ensure binary is correct type
+    binary = binary_image.astype(bool)
+
+    # Step 1: Distance transform
+    distance = ndimage.distance_transform_edt(binary)
+
+    # Step 2: FIXED adaptive min_distance (VERY IMPORTANT)
+    max_dist = np.max(distance)
+
+    if max_dist > 0:
+        # MUCH smaller than before (key fix)
+        adaptive_min_dist = int(max_dist * 0.12)
+        adaptive_min_dist = max(2, min(adaptive_min_dist, 10))
+    else:
+        adaptive_min_dist = 5
+
+    # Step 3: Find local maxima (grain centers)
+    local_maxi = peak_local_max(
+        distance,
+        min_distance=adaptive_min_dist,
+        labels=binary,
+        footprint=np.ones((3, 3))   # helps detect more peaks
+    )
+
+    # Step 4: Create markers
     markers = np.zeros(distance.shape, dtype=int)
     for i, (r, c) in enumerate(local_maxi):
         markers[r, c] = i + 1
-        
-    # 4. Apply Watershed
-    labels = watershed(-distance, markers, mask=binary_image)
-    
+
+    # Step 5: Apply watershed
+    labels = watershed(-distance, markers, mask=binary)
+
     return labels, distance
 
 if __name__ == "__main__":

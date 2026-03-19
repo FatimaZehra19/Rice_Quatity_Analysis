@@ -65,14 +65,18 @@ def analyze_rice_sample(image_path, model, grad_cam, save_image=False, output_fo
     # 1. Computer Vision Pipeline (Broken Grain Detection)
     binary, original = preprocess_image(image_path)
     if binary is None: return None
-    labels, _ = segment_grains(binary)
+    labels, distance = segment_grains(binary)
     features = extract_features(labels)
-    classified_data, (max_len, max_area) = classify_grains(features)
+    
+    # We use the folder name as the variety hint for more accurate quality analysis
+    category_name = os.path.basename(os.path.dirname(image_path))
+    classified_data, (max_len, max_area) = classify_grains(features, variety_name=category_name)
     
     full_count = sum(1 for g in classified_data if g['classification'] == 'Full')
     broken_count = len(classified_data) - full_count
     total = len(classified_data)
     percent_broken = (broken_count / total * 100) if total > 0 else 0
+    
     
     # 2. XAI / Deep Learning Pipeline (Variety Confirmation) 
     if save_image and model and grad_cam:
