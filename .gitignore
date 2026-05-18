@@ -4,10 +4,28 @@ __pycache__/
 *.pyd
 .env
 venv/
+env/
+.venv/
 .env/
 .ipynb_checkpoints/
 .DS_Store
 Thumbs.db
+.vscode/
+.idea/
 
 # large datasets
 Dataset/
+
+# model weights (large binary files — store separately or use DVC)
+Experiments/*.pth
+Experiments/*.pt
+
+# temporary files created by the app
+temp.jpg
+*.tmp
+
+# generated outputs (reproducible by running scripts)
+Results/*.png
+Results/*.csv
+Results/*.txt
+Results/Final_Broken_Grain_Report/

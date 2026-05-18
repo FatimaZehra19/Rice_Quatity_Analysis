@@ -4,6 +4,10 @@ opencv-python
 numpy
 matplotlib
 scikit-learn
+scikit-image
+scipy
 pandas
 tqdm
-lime
+Pillow
+streamlit
+seaborn

@@ -24,6 +24,7 @@ This section outlines the workflow for developing the automated classification s
 - **Loss Function**: `CrossEntropyLoss` was used to measure the discrepancy between the predicted and actual variety labels.
 - **Hyperparameter Configuration**: Training was conducted using mini-batch gradient descent with a batch size of **32**.
 - **Model Checkpointing**: The training process monitored validation accuracy across multiple epochs. The state-dictionary of the model achieving the **highest validation accuracy** was persisted as the "best-performing" candidate to prevent overfitting.
+- **Transfer Learning Strategy**: For MobileNetV2 and ResNet50, all convolutional backbone layers were **frozen** and only the custom classification head was trained (head-only fine-tuning). This is a conservative transfer learning strategy that preserves ImageNet-derived feature representations. The trade-off is that the frozen layers were never adapted to the rice domain, which can limit performance on datasets with narrow visual characteristics. Full end-to-end fine-tuning — where all layers are unfrozen and trained jointly with a reduced learning rate — is expected to yield higher accuracy for the transfer learning models and is recommended as a direction for future work.
 
 ### 1.4 Evaluation Framework
 - **Performance Verification**: Post-training, the optimized weights were evaluated on the independent test subset, ensuring that the accuracy metrics represent the model's ability to generalize to novel images.
@@ -42,17 +43,17 @@ A hybrid approach combining computer vision segmentation and geometric feature a
 - **Stage 2: Watershed-Based Segmentation**:
     - Touching or overlapping grains were separated using the Watershed algorithm. 
     - This involved calculating a distance transform measuring the distance from each grain pixel to the nearest background pixel.
-    - "Local peaks" were detected within these distance maps using a minimum distance constraint (min_distance=50) to prevent over-segmentation.
+    - "Local peaks" were detected within these distance maps using an **adaptive minimum distance constraint** (ranging from 6 to 30 pixels, calculated as 45% of the maximum distance transform value) to prevent over-segmentation. A fixed threshold of 35% of the maximum distance value was applied to filter weak peaks.
     - These peaks acted as markers for Watershed boundary definition.
 
 - **Stage 3: Geometric Feature Extraction**:
     - Extracted properties: **Area**, **Length** (Major Axis), **Width** (Minor Axis), and **Aspect Ratio**.
     - Centroids were identified for each grain for visual labeling ('F' for Full, 'B' for Broken).
 
-- **Stage 4: Relative Classification**:
-    - A dynamic approach was used where grain quality was judged relative to the reference size.
-    - A "Full Grain" reference was established by finding the maximum grain size in the image sample.
-    - Thresholds (75% of max length / 70% of max area) determined if a grain was classified as "Broken."
+- **Stage 4: Variety-Aware Absolute Classification**:
+    - When the rice variety is known (identified by the deep learning classifier), grain quality is judged against **absolute reference dimensions** measured from statistically validated full grains of that variety. This prevents the failure mode where an image containing only broken grains produces incorrect "Full" labels.
+    - Reference thresholds include a minimum area (pixels), minimum major axis length, and a minimum acceptable aspect ratio (set at 50% of the variety's canonical length-to-width ratio).
+    - When variety information is unavailable, a relative fallback is used: grains falling below 75% of the sample's maximum length or 70% of the maximum area are classified as "Broken."
 
 - **Stage 5: Batch Reporting and Visualization**:
     - Results were logged in an audit log across all five varieties.
