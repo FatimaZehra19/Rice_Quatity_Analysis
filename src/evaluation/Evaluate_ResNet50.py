@@ -20,7 +20,7 @@ _PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.append(str(_PROJECT_ROOT / "src" / "data"))
 from Dataset_loader import get_data_loaders
 
-_, _, test_loader, _ = get_data_loaders(batch_size=32)
+_, _, test_loader, _ = get_data_loaders(batch_size=32, num_workers=0)
 
 # ========== DEVICE SETUP ==========
 if torch.cuda.is_available():
@@ -49,19 +49,19 @@ model.fc = nn.Sequential(
 )
 
 model = model.to(device)
-print("✓ Model architecture loaded")
+print("[SUCCESS] Model architecture loaded")
 
 # Load the best trained model weights
 experiments_dir = Path(__file__).parent.parent / "Experiments"
 best_model_path = experiments_dir / "rice_resnet50_transfer_best.pth"
 
 if not best_model_path.exists():
-    print(f"❌ Error: Model not found at {best_model_path}")
+    print(f"[ERROR] Model not found at {best_model_path}")
     print("Please train the ResNet50 model first using Train.ResNet50.py")
     exit(1)
 
 model.load_state_dict(torch.load(best_model_path, map_location=device))
-print(f"✓ Best model loaded from: {best_model_path}")
+print(f"[SUCCESS] Best model loaded from: {best_model_path}")
 
 # ========== EVALUATION SETUP ==========
 class_names = sorted(['Arborio', 'Basmati', 'Ipsala', 'Jasmine', 'Karacadag'])
@@ -116,9 +116,9 @@ cm = confusion_matrix(all_labels, all_predictions)
 
 # Create figure for confusion matrix
 plt.figure(figsize=(10, 8))
-sns.heatmap(cm, annot=True, fmt='d', cmap=sns.light_palette("steelblue", as_cmap=True), 
-            xticklabels=class_names, 
-            yticklabels=class_names, 
+sns.heatmap(cm, annot=True, fmt='d', cmap="Blues",
+            xticklabels=class_names,
+            yticklabels=class_names,
             cbar_kws={'label': 'Count'},
             square=True)
 plt.title('Confusion Matrix - ResNet50 Transfer Learning', fontsize=14, fontweight='bold')
@@ -132,7 +132,7 @@ results_dir.mkdir(parents=True, exist_ok=True)
 
 cm_path = results_dir / "confusion_matrix_resnet50_model.png"
 plt.savefig(cm_path, dpi=300, bbox_inches='tight')
-print(f"✓ Confusion matrix PNG saved to: {cm_path}")
+print(f"[SUCCESS] Confusion matrix PNG saved to: {cm_path}")
 plt.close()
 
 # ========== GENERATE CLASSIFICATION REPORT ==========
@@ -163,7 +163,7 @@ with open(report_path, 'w') as f:
     f.write("="*70 + "\n")
     f.write(report)
 
-print(f"✓ Classification report saved to: {report_path}")
+print(f"[SUCCESS] Classification report saved to: {report_path}")
 
 # ========== FINAL SUMMARY ==========
 print("\n" + "="*70)

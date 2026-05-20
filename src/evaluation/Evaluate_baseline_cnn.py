@@ -15,7 +15,7 @@ from src.models.Baseline_CNN_Model import RiceCNN
 
 
 # ========== GET DATA ==========
-_, _, test_loader, class_names = get_data_loaders()
+_, _, test_loader, class_names = get_data_loaders(num_workers=0)
 
 
 # ========== DEVICE SETUP ==========
@@ -72,7 +72,7 @@ def plot_confusion_matrix(predictions, labels, model_name):
     plt.savefig(output_path, dpi=300)
     plt.close()
 
-    print(f"✓ Confusion matrix saved: {output_path}")
+    print(f"[SUCCESS] Confusion matrix saved: {output_path}")
 
 
 def generate_classification_report(predictions, labels, model_name):
@@ -90,20 +90,20 @@ def generate_classification_report(predictions, labels, model_name):
         f.write("=" * 60 + "\n")
         f.write(report)
 
-    print(f"✓ Classification report saved: {report_path}")
+    print(f"[SUCCESS] Classification report saved: {report_path}")
 
 
 def evaluate_model(model_path, model_name):
     """Evaluate model on test set"""
     if not model_path or not model_path.exists():
-        print(f"✗ Model not found: {model_path}")
+        print(f"[ERROR] Model not found: {model_path}")
         return None, None, None
 
     # Load model
     state_dict = torch.load(model_path, map_location=device)
     model.load_state_dict(state_dict)
 
-    print(f"\n✓ Loaded {model_name}: {model_path.name}")
+    print(f"\n[SUCCESS] Loaded {model_name}: {model_path.name}")
 
     model.eval()
 

@@ -7,28 +7,7 @@ Trains all three models sequentially and saves weights to Experiments/.
     MobileNetV2       -> Experiments/rice_mobilenetv2_transfer_best.pth
     ResNet50          -> Experiments/rice_resnet50_transfer_best.pth
 
-HOW TO RUN
-----------
-Local (after setting DATASET_PATH below):
-    python Train_All_Models.py
 
-Google Colab:
-    1. Upload your project zip to Drive, then mount it:
-         from google.colab import drive
-         drive.mount('/content/drive')
-    2. Unzip:
-         !unzip /content/drive/MyDrive/Rice_thesis_project.zip -d /content/
-    3. Install deps:
-         !pip install torch torchvision tqdm
-    4. Run:
-         !python /content/Rice_thesis_project/Train_All_Models.py
-
-Kaggle:
-    1. Upload dataset via Kaggle Datasets tab (or use the Kaggle rice dataset directly)
-    2. Set DATASET_PATH = "/kaggle/input/rice-image-dataset/Rice_Image_Dataset"
-    3. Run as a Kaggle notebook cell: exec(open("Train_All_Models.py").read())
-
-GPU tip: if you have a GPU, increase BATCH_SIZE to 64 or 128 for faster training.
 """
 
 # =============================================================================
@@ -44,7 +23,6 @@ import random
 import time
 from datetime import datetime
 from pathlib import Path
-
 import numpy as np
 import torch
 import torch.nn as nn
@@ -75,16 +53,20 @@ elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
 else:
     DEVICE = torch.device("cpu")
 
-# ── training hyperparameters ─────────────────────────────────────────────────
-NUM_EPOCHS    = 30
-BATCH_SIZE    = 32    # increase to 64 or 128 on a GPU
-LR            = 0.001
-WEIGHT_DECAY  = 1e-4
-LR_STEP       = 10    # StepLR: drop LR every N epochs
-LR_GAMMA      = 0.5   # StepLR: multiply LR by this factor
-NUM_CLASSES   = 5
-HIDDEN_UNITS  = 512
-DROPOUT       = 0.5
+# ── training hyperparameters (optimized for 75,000 image dataset) ─────────────
+NUM_EPOCHS    = 25          # Reduced from 30: larger datasets converge faster
+BATCH_SIZE    = 64          # Increased from 32: better GPU utilization with 75K images
+LR            = 0.001       # Standard learning rate for transfer learning
+WEIGHT_DECAY  = 1e-4        # L2 regularization
+LR_STEP       = 10          # StepLR: drop LR every N epochs
+LR_GAMMA      = 0.5         # StepLR: multiply LR by this factor (e.g., 0.001 → 0.0005)
+NUM_CLASSES   = 5           # 5 rice varieties
+HIDDEN_UNITS  = 512         # FC layer hidden dimension
+DROPOUT       = 0.5         # Dropout rate for regularization
+
+# Data augmentation (important for large datasets)
+AUGMENTATION_ENABLED = True
+AUGMENTATION_PROB = 0.5     # 50% chance to apply augmentation to each training image
 
 
 # =============================================================================
@@ -92,30 +74,74 @@ DROPOUT       = 0.5
 # =============================================================================
 
 def build_dataloaders(dataset_path, batch_size=BATCH_SIZE):
-    transform = transforms.Compose([
+    """
+    Build dataloaders with data augmentation for training set.
+    Validation and test sets use standard transforms only (no augmentation).
+    """
+
+    # Base transforms (applied to all datasets)
+    base_transform = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406],
                              std =[0.229, 0.224, 0.225]),
     ])
 
-    full_dataset = datasets.ImageFolder(root=dataset_path, transform=transform)
+    # Training transforms WITH augmentation (improves robustness with large datasets)
+    if AUGMENTATION_ENABLED:
+        train_transform = transforms.Compose([
+            transforms.Resize((224, 224)),
+            transforms.RandomHorizontalFlip(p=0.5),        # Random horizontal flip
+            transforms.RandomRotation(10),                  # Random rotation ±10°
+            transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),  # Color variations
+            transforms.GaussianBlur(kernel_size=3, sigma=(0.1, 0.2)),  # Light blur
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                std =[0.229, 0.224, 0.225]),
+        ])
+    else:
+        train_transform = base_transform
+
+    # Load full dataset first (to get class names)
+    full_dataset = datasets.ImageFolder(root=dataset_path, transform=base_transform)
     n = len(full_dataset)
+
+    # Split indices
     train_n = int(0.70 * n)
     val_n   = int(0.15 * n)
     test_n  = n - train_n - val_n
 
+    # Create random splits using fixed seed
     generator = torch.Generator().manual_seed(SEED)
-    train_ds, val_ds, test_ds = random_split(
-        full_dataset, [train_n, val_n, test_n], generator=generator
-    )
+    indices = torch.randperm(n, generator=generator).tolist()
+    train_indices = indices[:train_n]
+    val_indices   = indices[train_n:train_n + val_n]
+    test_indices  = indices[train_n + val_n:]
 
-    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True,  num_workers=2, pin_memory=True)
-    val_loader   = DataLoader(val_ds,   batch_size=batch_size, shuffle=False, num_workers=2, pin_memory=True)
-    test_loader  = DataLoader(test_ds,  batch_size=batch_size, shuffle=False, num_workers=2, pin_memory=True)
+    # Create datasets with different transforms
+    from torch.utils.data import Subset
+    train_ds = Subset(full_dataset, train_indices)
+    val_ds   = Subset(full_dataset, val_indices)
+    test_ds  = Subset(full_dataset, test_indices)
+
+    # Apply augmentation to training subset by modifying its transform
+    train_ds.dataset.transform = train_transform
+
+    # Optimize num_workers based on CPU availability
+    num_workers = 4 if torch.cuda.is_available() else 2
+
+    # Create DataLoaders with optimizations for large dataset
+    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True,
+                            num_workers=num_workers, pin_memory=True, persistent_workers=True)
+    val_loader   = DataLoader(val_ds,   batch_size=batch_size, shuffle=False,
+                            num_workers=num_workers, pin_memory=True, persistent_workers=True)
+    test_loader  = DataLoader(test_ds,  batch_size=batch_size, shuffle=False,
+                            num_workers=num_workers, pin_memory=True, persistent_workers=True)
 
     print(f"  Dataset : {n:,} images  |  Classes: {full_dataset.classes}")
     print(f"  Split   : {train_n:,} train  /  {val_n:,} val  /  {test_n:,} test")
+    print(f"  Augmentation: {'ENABLED (RandomFlip, Rotation, ColorJitter, Blur)' if AUGMENTATION_ENABLED else 'DISABLED'}")
+    print(f"  Batch Size: {batch_size}  |  Workers: {num_workers}  |  Device: {DEVICE}")
 
     return train_loader, val_loader, test_loader, full_dataset.classes
 

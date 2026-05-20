@@ -1,6 +1,6 @@
 # Methodology
 
-The development of the proposed system for rice quality assessment is divided into two primary pipelines: **Rice Variety Classification** using Deep Learning and **Broken Grain Detection** using a Hybrid Computer Vision Approach.
+The development of the proposed system focuses on **Rice Variety Classification** using Deep Learning, with plans to extend to grain quality assessment in future work.
 
 ## 1. Rice Variety Classification Methodology
 
@@ -22,56 +22,35 @@ This section outlines the workflow for developing the automated classification s
 ### 1.3 Model Training Strategy and Optimization
 - **Optimization Algorithm**: The **Adam Optimizer** was employed for parameter updates with a learning rate of **0.001**.
 - **Loss Function**: `CrossEntropyLoss` was used to measure the discrepancy between the predicted and actual variety labels.
-- **Hyperparameter Configuration**: Training was conducted using mini-batch gradient descent with a batch size of **32**.
+- **Hyperparameter Configuration**: Training was conducted using mini-batch gradient descent with:
+  - **Batch Size**: 64 (increased from 32 to leverage the 75,000-image dataset for better GPU utilization)
+  - **Number of Epochs**: 25 (reduced from 30; larger datasets converge faster)
+  - **Learning Rate Scheduler**: StepLR with decay factor 0.5 every 10 epochs
+  - **Weight Decay**: 1e-4 (L2 regularization)
+
+- **Data Augmentation**: To improve model robustness and prevent overfitting on the large dataset, the following augmentation techniques were applied exclusively to the training set:
+  - **RandomHorizontalFlip** (p=0.5): Handles image orientation variations
+  - **RandomRotation** (±10°): Provides robustness to grain rotation
+  - **ColorJitter** (brightness, contrast, saturation ±0.2): Simulates lighting variations
+  - **GaussianBlur** (kernel=3, σ=0.1-0.2): Reduces overfitting to image noise
+  - Validation and test sets used **standard transforms only** (no augmentation) for fair evaluation
+
 - **Model Checkpointing**: The training process monitored validation accuracy across multiple epochs. The state-dictionary of the model achieving the **highest validation accuracy** was persisted as the "best-performing" candidate to prevent overfitting.
+
 - **Transfer Learning Strategy**: For MobileNetV2 and ResNet50, all convolutional backbone layers were **frozen** and only the custom classification head was trained (head-only fine-tuning). This is a conservative transfer learning strategy that preserves ImageNet-derived feature representations. The trade-off is that the frozen layers were never adapted to the rice domain, which can limit performance on datasets with narrow visual characteristics. Full end-to-end fine-tuning — where all layers are unfrozen and trained jointly with a reduced learning rate — is expected to yield higher accuracy for the transfer learning models and is recommended as a direction for future work.
 
 ### 1.4 Evaluation Framework
 - **Performance Verification**: Post-training, the optimized weights were evaluated on the independent test subset, ensuring that the accuracy metrics represent the model's ability to generalize to novel images.
 - **Metrics**: Performance was quantified using standard classification metrics including accuracy, precision, and recall.
 
-## 2. Broken Grain Detection Methodology
-
-A hybrid approach combining computer vision segmentation and geometric feature analysis was used to detect broken rice grains. The methodology is divided into several modular stages for robust and clean image processing:
-
-- **Stage 1: Image Preprocessing**:
-    - High-quality grayscale conversion was performed to simplify the image data.
-    - Gaussian blurring was applied to reduce noise and artifacts.
-    - Otsu's thresholding was used for determining optimal thresholds for image segmentation (grains as foreground).
-    - Morphological opening was as a final cleanup step to remove tiny background specks or dust.
-
-- **Stage 2: Watershed-Based Segmentation**:
-    - Touching or overlapping grains were separated using the Watershed algorithm. 
-    - This involved calculating a distance transform measuring the distance from each grain pixel to the nearest background pixel.
-    - "Local peaks" were detected within these distance maps using an **adaptive minimum distance constraint** (ranging from 6 to 30 pixels, calculated as 45% of the maximum distance transform value) to prevent over-segmentation. A fixed threshold of 35% of the maximum distance value was applied to filter weak peaks.
-    - These peaks acted as markers for Watershed boundary definition.
-
-- **Stage 3: Geometric Feature Extraction**:
-    - Extracted properties: **Area**, **Length** (Major Axis), **Width** (Minor Axis), and **Aspect Ratio**.
-    - Centroids were identified for each grain for visual labeling ('F' for Full, 'B' for Broken).
-
-- **Stage 4: Variety-Aware Absolute Classification**:
-    - When the rice variety is known (identified by the deep learning classifier), grain quality is judged against **absolute reference dimensions** measured from statistically validated full grains of that variety. This prevents the failure mode where an image containing only broken grains produces incorrect "Full" labels.
-    - Reference thresholds include a minimum area (pixels), minimum major axis length, and a minimum acceptable aspect ratio (set at 50% of the variety's canonical length-to-width ratio).
-    - When variety information is unavailable, a relative fallback is used: grains falling below 75% of the sample's maximum length or 70% of the maximum area are classified as "Broken."
-
-- **Stage 5: Batch Reporting and Visualization**:
-    - Results were logged in an audit log across all five varieties.
-    - Visual bar charts were generated to compare broken grain ratios between categories.
-
-## 3. Explainable AI (XAI) and Interpretability
+## 2. Explainable AI (XAI) and Interpretability
 
 To ensure the transparency and reliability of the classification models, Explainable AI (XAI) techniques were integrated into the research workflow.
 
-### 3.1 Visual Interpretability with Grad-CAM
+### 2.1 Visual Interpretability with Grad-CAM
 - **Objective**: To identify which spatial regions of a rice image the CNN (MobileNetV2 or ResNet50) prioritizes when predicting a specific variety.
 - **Gradient-weighted Class Activation Mapping (Grad-CAM)**: This technique utilizes the gradients of the target class (e.g., *Basmati*), flowing into the final convolutional layer to produce a localization map.
 - **Target Layers**:
   - **MobileNetV2**: The final expansion/depthwise-convolutional layer in the feature extractor (`features[18][0]`).
   - **ResNet50**: The final bottleneck block in the fourth residual layer (`layer4[-1]`).
 - **Heatmap Visualization**: The resulting activation map is superimposed on the original grain image, where warmer colors (red/yellow) indicate higher influence on the model’s classification decision.
-
-### 3.2 Interpretability in Geometric Pipelines
-- **Feature-Space Visualization**: For the broken grain detection pipeline, the decision logic is made "explainable" by visualizing the feature space (Length vs. Area).
-- **Decision Boundary**: Plotting individual grains against the dynamically calculated "Full Grain" reference thresholds allows for a direct audit of the classification logic.
-- **Geometric Annotation**: Automated labeling of each grain with its specific measurements (length/area) provides a clear rationale for every individual "Full" vs. "Broken" classification decision.

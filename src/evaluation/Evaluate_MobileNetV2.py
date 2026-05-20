@@ -17,7 +17,7 @@ from torchvision import models
 
 
 # ========== GET DATA ==========
-_, _, test_loader, class_names = get_data_loaders()
+_, _, test_loader, class_names = get_data_loaders(num_workers=0)
 
 
 # ========== DEVICE ==========
@@ -67,7 +67,7 @@ if not model_path.exists():
 state_dict = torch.load(model_path, map_location=device)
 model.load_state_dict(state_dict)
 
-print(f"✓ Loaded trained MobileNetV2 model")
+print(f"[SUCCESS] Loaded trained MobileNetV2 model")
 
 
 # ========== FUNCTIONS ==========
@@ -123,7 +123,7 @@ def plot_confusion_matrix(predictions, labels):
     plt.savefig(output_path, dpi=300)
     plt.close()
 
-    print(f"✓ Confusion matrix saved: {output_path}")
+    print(f"[SUCCESS] Confusion matrix saved: {output_path}")
 
 
 def generate_classification_report(predictions, labels):
@@ -140,7 +140,7 @@ def generate_classification_report(predictions, labels):
         f.write("=" * 60 + "\n")
         f.write(report)
 
-    print(f"✓ Classification report saved: {report_path}")
+    print(f"[SUCCESS] Classification report saved: {report_path}")
 
 
 # ========== MAIN ==========
