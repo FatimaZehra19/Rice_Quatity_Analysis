@@ -172,7 +172,7 @@ else:
 print("\n[2/3] MOBILENETV2")
 print("-" * 70)
 
-mobilenet_model = models.mobilenet_v2(weights=models.MobileNet_V2_Weights.IMAGENET1K_V1).to(DEVICE)
+mobilenet_model = models.mobilenet_v2(weights=models.MobileNet_V2_Weights.IMAGENET1K_V1)
 last_channel = mobilenet_model.last_channel
 mobilenet_model.classifier = nn.Sequential(
     nn.Dropout(0.5),
@@ -181,6 +181,7 @@ mobilenet_model.classifier = nn.Sequential(
     nn.Dropout(0.5),
     nn.Linear(512, NUM_CLASSES)
 )
+mobilenet_model = mobilenet_model.to(DEVICE)
 
 mobilenet_path = PROJECT_ROOT / "Experiments" / "rice_mobilenetv2_transfer_best.pth"
 
@@ -188,6 +189,7 @@ if not mobilenet_path.exists():
     print(f"[ERROR] Model not found at {mobilenet_path}")
 else:
     mobilenet_model.load_state_dict(torch.load(mobilenet_path, map_location=DEVICE))
+    mobilenet_model = mobilenet_model.to(DEVICE)
     print(f"[SUCCESS] Loaded model from {mobilenet_path}")
 
     mobilenet_preds, mobilenet_labels, mobilenet_acc = evaluate_model(mobilenet_model, test_loader, DEVICE)
@@ -198,13 +200,14 @@ else:
 print("\n[3/3] RESNET50")
 print("-" * 70)
 
-resnet_model = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V1).to(DEVICE)
+resnet_model = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V1)
 resnet_model.fc = nn.Sequential(
     nn.Linear(resnet_model.fc.in_features, 512),
     nn.ReLU(),
     nn.Dropout(0.5),
     nn.Linear(512, NUM_CLASSES)
 )
+resnet_model = resnet_model.to(DEVICE)
 
 resnet_path = PROJECT_ROOT / "Experiments" / "rice_resnet50_transfer_best.pth"
 
@@ -212,6 +215,7 @@ if not resnet_path.exists():
     print(f"[ERROR] Model not found at {resnet_path}")
 else:
     resnet_model.load_state_dict(torch.load(resnet_path, map_location=DEVICE))
+    resnet_model = resnet_model.to(DEVICE)
     print(f"[SUCCESS] Loaded model from {resnet_path}")
 
     resnet_preds, resnet_labels, resnet_acc = evaluate_model(resnet_model, test_loader, DEVICE)

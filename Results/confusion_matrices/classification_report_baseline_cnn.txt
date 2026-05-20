@@ -1,0 +1,14 @@
+Classification Report - Baseline CNN
+======================================================================
+
+              precision    recall  f1-score   support
+
+     Arborio     0.9974    0.9969    0.9972      2288
+     Basmati     0.9987    0.9973    0.9980      2244
+      Ipsala     0.9991    1.0000    0.9996      2225
+     Jasmine     0.9978    0.9951    0.9964      2231
+   Karacadag     0.9965    1.0000    0.9982      2262
+
+    accuracy                         0.9979     11250
+   macro avg     0.9979    0.9979    0.9979     11250
+weighted avg     0.9979    0.9979    0.9979     11250

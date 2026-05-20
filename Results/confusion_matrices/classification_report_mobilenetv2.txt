@@ -1,0 +1,14 @@
+Classification Report - MobileNetV2
+======================================================================
+
+              precision    recall  f1-score   support
+
+     Arborio     0.9965    0.9899    0.9932      2288
+     Basmati     0.9978    0.9947    0.9962      2244
+      Ipsala     1.0000    1.0000    1.0000      2225
+     Jasmine     0.9898    0.9955    0.9926      2231
+   Karacadag     0.9947    0.9987    0.9967      2262
+
+    accuracy                         0.9957     11250
+   macro avg     0.9957    0.9958    0.9957     11250
+weighted avg     0.9957    0.9957    0.9957     11250
